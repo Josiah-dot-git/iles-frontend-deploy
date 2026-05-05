@@ -2,7 +2,7 @@ import "../styles/homePage.css";
 
 function HomePage({ onChooseLogin, onChooseRegister }) {
   function openDjangoAdmin() {
-    window.open("http://127.0.0.1:8000/admin/", "_blank");
+    window.open("https://iles-backend.onrender.com/admin/", "_blank");
   }
 
   return (

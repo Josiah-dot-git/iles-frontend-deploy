@@ -40,18 +40,28 @@ function App() {
 
   useEffect(() => {
     const savedUser = localStorage.getItem("iles_user");
+    const savedToken = localStorage.getItem("iles_token");
 
-    if (savedUser) {
+    if (savedUser && savedToken) {
       try {
         setLoggedInUser(JSON.parse(savedUser));
         setCurrentView("app");
       } catch {
-        localStorage.removeItem("iles_user");
+        clearStoredAuth();
         setLoggedInUser(null);
         setCurrentView("home");
       }
+    } else {
+      clearStoredAuth();
+      setLoggedInUser(null);
+      setCurrentView("home");
     }
   }, []);
+
+  function clearStoredAuth() {
+    localStorage.removeItem("iles_user");
+    localStorage.removeItem("iles_token");
+  }
 
   function handleChooseLogin(role, type = "") {
     setLoginRole(role);
@@ -80,7 +90,7 @@ function App() {
   }
 
   function handleLogout() {
-    localStorage.removeItem("iles_user");
+    clearStoredAuth();
     setLoggedInUser(null);
     setCurrentView("home");
     setActivePage("dashboard");
@@ -256,7 +266,7 @@ function App() {
         )}
 
         <span style={{ marginLeft: "auto", fontWeight: "bold" }}>
-          {loggedInUser?.username} - {loggedInUser?.role}
+          {loggedInUser?.username} - {loggedInUser?.role || "SYSTEM ADMIN"}
         </span>
 
         <button onClick={handleLogout}>Logout</button>

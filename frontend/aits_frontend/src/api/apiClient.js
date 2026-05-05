@@ -1,19 +1,8 @@
 const API_BASE_URL =
   process.env.REACT_APP_API_BASE_URL || "http://localhost:8000/api";
 
-function getCookie(name) {
-  const cookieString = document.cookie || "";
-  const cookies = cookieString.split(";");
-
-  for (let cookie of cookies) {
-    cookie = cookie.trim();
-
-    if (cookie.startsWith(name + "=")) {
-      return decodeURIComponent(cookie.substring(name.length + 1));
-    }
-  }
-
-  return null;
+function getStoredToken() {
+  return localStorage.getItem("iles_token");
 }
 
 function formatFieldName(field) {
@@ -116,20 +105,14 @@ async function readResponseData(response) {
 
 async function apiRequest(endpoint, options = {}) {
   const method = options.method || "GET";
+  const token = getStoredToken();
 
   const headers = {
     Accept: "application/json",
     ...(options.body ? { "Content-Type": "application/json" } : {}),
+    ...(token ? { Authorization: `Token ${token}` } : {}),
     ...(options.headers || {}),
   };
-
-  if (!["GET", "HEAD", "OPTIONS"].includes(method.toUpperCase())) {
-    const csrfToken = getCookie("csrftoken");
-
-    if (csrfToken) {
-      headers["X-CSRFToken"] = csrfToken;
-    }
-  }
 
   let response;
 
@@ -138,7 +121,6 @@ async function apiRequest(endpoint, options = {}) {
       ...options,
       method,
       headers,
-      credentials: "include",
     });
   } catch {
     throw new Error(
